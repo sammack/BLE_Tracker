@@ -29,6 +29,8 @@
 
 package com.samtmackenzie.ble_tracker;
 
+import java.util.UUID;
+
 import android.bluetooth.BluetoothDevice;
 import android.os.ParcelUuid;
 
@@ -41,21 +43,25 @@ import android.os.ParcelUuid;
 public class BleDeviceRecord {
     String bleName;
     String bleAddress;
-    ParcelUuid[] bleUUID;
-    String gpsLocation;
-    int peakRSSI;
+    ParcelUuid[] bleUUIDs;
+    double[] bleLocation;
+    int peakRSSI = -127;
     
-    public BleDeviceRecord(BluetoothDevice device, String gpsLocation) {
+    public BleDeviceRecord(BluetoothDevice device, double[] location, int newRSSI) {
         bleName = device.getName();
         bleAddress = device.getAddress();
-        bleUUID = device.getUuids();
+        bleLocation = location;
+        peakRSSI = newRSSI;
     }
     
-    public ParcelUuid[] getUUID(){ return bleUUID; }
+    public ParcelUuid[] getUUID(){ return bleUUIDs; }
     
-    public String UuidToString(){ return bleUUID.toString(); }
+    public String UuidToString(){ 
+    	//UUID baseUUID = bleUUIDs[1].getUuid();
+    	return "no UUIDs";
+    	}
     
-    public String getName() { return bleName; }
+    public String getName(){ return bleName; }
         
     public String getAddress(){ return bleAddress; }
         
@@ -64,7 +70,9 @@ public class BleDeviceRecord {
     public void setPeakRSSI(int newPeakRSSI){ peakRSSI = newPeakRSSI; }
     
     public String toString(){
-        //return (bleName  + UuidToString() + gpsLocation);
-        return bleName;
+        String locaionString = Double.toString(bleLocation[0]) + " " + 
+                               Double.toString(bleLocation[1]); 
+        return "Name: " + bleName + "\n" + "MAC ADDR: " + bleAddress + "\nPeak RSSI: "  
+    	       + peakRSSI + "\n Location: " + locaionString + "\n\n";
     } 
 }

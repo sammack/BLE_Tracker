@@ -48,7 +48,9 @@ public class MainActivity extends Activity {
  //   private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private BluetoothAdapter mBluetoothAdapter;
     private int numberOfBleDevices = 0;
-    ArrayList<BleDeviceRecord> bleDevices = new ArrayList<BleDeviceRecord>(); 
+    private ArrayList<BleDeviceRecord> bleDevices = new ArrayList<BleDeviceRecord>(); 
+    Context mContext = this;
+    //SingleLocation mSingleLocation;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,14 +74,10 @@ public class MainActivity extends Activity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
         }
- /* TODO: Make locations stuff work      
-        // Get a location manager instance 
-        final  LocationManager mLocationManager = (LocationManager) 
-                getSystemService(Context.LOCATION_SERVICE);
         
-        if(!mLocationManager.isProviderEnabled("gps")){
-            //TODO: prompt user to turn on GPS
-        }*/
+        // create a new SingleLocation object in the current contex
+        //mSingleLocation = new SingleLocation(this);
+
     }
 
     @Override
@@ -138,13 +136,15 @@ public class MainActivity extends Activity {
                            if(index.getPeakRSSI() < rssi)
                                index.setPeakRSSI(rssi);
                        }
-                       allDeviceString += index.getName();
+                       allDeviceString += index.toString();
                    }
                    // if it didn't match any of them create a new device and add
                    // it to the list, then print it to the screen too.
                    if(newRecord == true){
-                       String location = "nope"; // TODO add location once GPS is working
-                       BleDeviceRecord mBleDeviceRecord = new BleDeviceRecord(device, location);
+                       SingleLocation mSingleLocation = new SingleLocation(mContext);
+                       double[] locationArray = {0,0};
+                       locationArray = mSingleLocation.getLatestLocation();
+                       BleDeviceRecord mBleDeviceRecord = new BleDeviceRecord(device, locationArray, rssi);
                        bleDevices.add(mBleDeviceRecord);
                        allDeviceString += mBleDeviceRecord.toString();
                    }
