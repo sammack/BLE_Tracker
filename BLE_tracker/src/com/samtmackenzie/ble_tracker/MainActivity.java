@@ -1,30 +1,31 @@
 /* 
- Author: Sam MacKenzie
- Repository: https://github.com/sammack/BLE_Tracker
- Email: samtmackenzie@gmail.com
- website: www.samtmackenzie.com  
-  
- The MIT License (MIT)
-
-Copyright (c) [2014] [Sam MacKenzie]
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.*/
+* Author: Sam MacKenzie
+* Repository: https://github.com/sammack/BLE_Tracker
+* Email: samtmackenzie@gmail.com
+* website: www.samtmackenzie.com  
+*  
+* The MIT License (MIT)
+* 
+* Copyright (c) [2014] [Sam MacKenzie]
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*/
 
 package com.samtmackenzie.ble_tracker;
 
@@ -71,7 +72,7 @@ public class MainActivity extends Activity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
         }
- /*       
+ /* TODO: Make locations stuff work      
         // Get a location manager instance 
         final  LocationManager mLocationManager = (LocationManager) 
                 getSystemService(Context.LOCATION_SERVICE);
@@ -109,7 +110,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // as you specify a parent activity in AndroidManifest.xml.       
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -131,26 +132,25 @@ public class MainActivity extends Activity {
                    for(BleDeviceRecord index : bleDevices){
                        // check if there this one already exists if it does
                        // check if it's RSSI is now higher and update it.
-                       if(index.getUUID() == device.getUuids()){
+                	   // compare by MAC address as each is unique.
+                       if( index.getAddress().equals(device.getAddress()) ){
                            newRecord = false;
                            if(index.getPeakRSSI() < rssi)
                                index.setPeakRSSI(rssi);
                        }
-                       allDeviceString += index.toString();
-  
+                       allDeviceString += index.getName();
                    }
-                   
                    // if it didn't match any of them create a new device and add
-                   // it to the list, the print it to the screen too.
+                   // it to the list, then print it to the screen too.
                    if(newRecord == true){
                        String location = "nope"; // TODO add location once GPS is working
                        BleDeviceRecord mBleDeviceRecord = new BleDeviceRecord(device, location);
                        bleDevices.add(mBleDeviceRecord);
                        allDeviceString += mBleDeviceRecord.toString();
                    }
+                   // write the records into the text view.
                    TextView textView2 = (TextView) findViewById(R.id.ble_device_parameters);
                    textView2.setText(allDeviceString);
-
                }
            });
        }
