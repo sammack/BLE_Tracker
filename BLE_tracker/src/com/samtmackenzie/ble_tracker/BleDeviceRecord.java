@@ -29,10 +29,8 @@
 
 package com.samtmackenzie.ble_tracker;
 
-import java.util.UUID;
 
 import android.bluetooth.BluetoothDevice;
-import android.os.ParcelUuid;
 
 /* Class for each Bluetooth device found.
  * stores the name, address, UUID, location and 
@@ -43,36 +41,34 @@ import android.os.ParcelUuid;
 public class BleDeviceRecord {
     String bleName;
     String bleAddress;
-    ParcelUuid[] bleUUIDs;
     double[] bleLocation;
+    String locationQuality;
     int peakRSSI = -127;
     
-    public BleDeviceRecord(BluetoothDevice device, double[] location, int newRSSI) {
+    public BleDeviceRecord(BluetoothDevice device, double[] location, 
+                           String quality, int newRSSI) {
         bleName = device.getName();
         bleAddress = device.getAddress();
         bleLocation = location;
         peakRSSI = newRSSI;
+        locationQuality = quality;
     }
     
-    public ParcelUuid[] getUUID(){ return bleUUIDs; }
-    
-    public String UuidToString(){ 
-    	//UUID baseUUID = bleUUIDs[1].getUuid();
-    	return "no UUIDs";
-    	}
-    
     public String getName(){ return bleName; }
-        
     public String getAddress(){ return bleAddress; }
-        
     public int getPeakRSSI(){ return peakRSSI; }
-    
+    public double[] getBleLocation(){ return bleLocation; };
     public void setPeakRSSI(int newPeakRSSI){ peakRSSI = newPeakRSSI; }
+    
+    public void setBleLocation(double[] newLocation, String newQuality){
+        bleLocation = newLocation; 
+        locationQuality = newQuality;
+    }
     
     public String toString(){
         String locaionString = Double.toString(bleLocation[0]) + " " + 
                                Double.toString(bleLocation[1]); 
-        return "Name: " + bleName + "\n" + "MAC ADDR: " + bleAddress + "\nPeak RSSI: "  
-    	       + peakRSSI + "\n Location: " + locaionString + "\n\n";
+        return "Name: " + bleName + "\nMAC ADDR: " + bleAddress + "\nPeak RSSI: "  
+    	       + peakRSSI + "\nLocation: " + locaionString + "  " + locationQuality + "\n\n";
     } 
 }

@@ -36,7 +36,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,12 +44,9 @@ import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
- //   private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private BluetoothAdapter mBluetoothAdapter;
-    private int numberOfBleDevices = 0;
     private ArrayList<BleDeviceRecord> bleDevices = new ArrayList<BleDeviceRecord>(); 
     Context mContext = this;
-    //SingleLocation mSingleLocation;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +70,6 @@ public class MainActivity extends Activity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 1);
         }
-        
-        // create a new SingleLocation object in the current contex
-        //mSingleLocation = new SingleLocation(this);
-
     }
 
     @Override
@@ -86,15 +78,13 @@ public class MainActivity extends Activity {
         
         // start scanning for Bluetooth devices
         mBluetoothAdapter.startLeScan(mLeScanCallback);
-       TextView textView  = (TextView) findViewById(R.id.counter);
-       textView.setText(Integer.toString(numberOfBleDevices));
     }
     
     @Override
     protected void onStop(){
         super.onStop();
         // stop scanning for Bluetooth devices when you stop the program
-        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+        //mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
 
     @Override
@@ -133,8 +123,15 @@ public class MainActivity extends Activity {
                 	   // compare by MAC address as each is unique.
                        if( index.getAddress().equals(device.getAddress()) ){
                            newRecord = false;
+                           // Check if the new RSSI is higher than in the record
                            if(index.getPeakRSSI() < rssi)
                                index.setPeakRSSI(rssi);
+                           // check if the record has a valid location
+                           if(index.getBleLocation()[0] == 0 ){
+                               SingleLocation mSingleLocation = new SingleLocation(mContext);
+                               index.setBleLocation(mSingleLocation.getLatestLocation(), 
+                                                    mSingleLocation.getLatestQuality());
+                           }
                        }
                        allDeviceString += index.toString();
                    }
@@ -144,7 +141,8 @@ public class MainActivity extends Activity {
                        SingleLocation mSingleLocation = new SingleLocation(mContext);
                        double[] locationArray = {0,0};
                        locationArray = mSingleLocation.getLatestLocation();
-                       BleDeviceRecord mBleDeviceRecord = new BleDeviceRecord(device, locationArray, rssi);
+                       BleDeviceRecord mBleDeviceRecord = new BleDeviceRecord(device, locationArray, 
+                                                          mSingleLocation.getLatestQuality(), rssi);
                        bleDevices.add(mBleDeviceRecord);
                        allDeviceString += mBleDeviceRecord.toString();
                    }
