@@ -37,7 +37,6 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -89,32 +88,26 @@ public class MainActivity extends Activity {
     public void onDestroy()
     {
             super.onDestroy();
-            // stop the Bluetooth scanning if the app is finished 
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
+    
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_activity_action, menu);
+    public boolean onCreateOptionsMenu(Menu menu) { getMenuInflater()
+                   .inflate(R.menu.main_activity_action, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.       
+    public boolean onOptionsItemSelected(MenuItem item) {     
         int id = item.getItemId();
         if (id == R.id.action_exit) {
             finish();
             return true;
         }
         if (id == R.id.action_map) {
+            // the map option was selected to pass the arraylist 
+            // of ble devices to the mapScreen activity 
             Intent mapScreen = new Intent().setClass(getApplicationContext(), BleMapActivity.class);
-            ArrayList<BleDeviceRecord> arrayToPut = new ArrayList<BleDeviceRecord>();
-            for (int i = 0; i < bleDevices.size(); i++)
-                arrayToPut.add (bleDevices.get(i));
-            mapScreen.putParcelableArrayListExtra("devices", arrayToPut);
+            mapScreen.putParcelableArrayListExtra("devices", bleDevices);
             startActivity(mapScreen);
             return true;
         }
@@ -133,12 +126,12 @@ public class MainActivity extends Activity {
                    Boolean newRecord = true;
                    String allDeviceString = "";
                    for(BleDeviceRecord index : bleDevices){
-                       // check if there this one already exists if it does
-                       // check if it's RSSI is now higher and update it.
-                	   // compare by MAC address as each is unique.
+                       // check if there this one already exists by comparing MAC address
+                       // if it does exist check if it's RSSI is now higher and update it.
+                       // finally check if you now have a valid location where before it was 0,0
                        if( index.getAddress().equals(device.getAddress()) ){
                            newRecord = false;
-                           // Check if the new RSSI is higher than in the record
+                           //Check if the new RSSI is higher than in the record
                            if(index.getPeakRSSI() < rssi)
                                index.setPeakRSSI(rssi);
                            // check if the record has a valid location
@@ -148,6 +141,7 @@ public class MainActivity extends Activity {
                                                     mSingleLocation.getLatestQuality());
                            }
                        }
+                       // add the record to the string you will be printing on the screen.
                        allDeviceString += index.toString();
                    }
                    // if it didn't match any of them create a new device and add

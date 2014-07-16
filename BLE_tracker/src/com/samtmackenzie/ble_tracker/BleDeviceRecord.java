@@ -106,7 +106,8 @@ public class BleDeviceRecord implements Parcelable{
         return 0;
     }
 
-    public static final Parcelable.Creator<BleDeviceRecord> CREATOR = new Parcelable.Creator<BleDeviceRecord>() {
+    public static final Parcelable.Creator<BleDeviceRecord> CREATOR = 
+                        new Parcelable.Creator<BleDeviceRecord>() {
         public BleDeviceRecord createFromParcel(Parcel in) {
             return new BleDeviceRecord(in);
         }
