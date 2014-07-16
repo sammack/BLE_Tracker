@@ -7,5 +7,6 @@
     <string name="defualt">0</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
     <string name="no_ble_yet">No BLE Devices.</string>
-
+	<string name="action_map">Map</string>
+	<string name="action_exit">Stop Scan and Exit</string>
 </resources>

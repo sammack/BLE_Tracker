@@ -37,6 +37,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -75,7 +76,6 @@ public class MainActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume(); 
-        
         // start scanning for Bluetooth devices
         mBluetoothAdapter.startLeScan(mLeScanCallback);
     }
@@ -83,14 +83,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop(){
         super.onStop();
-        // stop scanning for Bluetooth devices when you stop the program
-        //mBluetoothAdapter.stopLeScan(mLeScanCallback);
     }
-
+    
+    @Override
+    public void onDestroy()
+    {
+            super.onDestroy();
+            // stop the Bluetooth scanning if the app is finished 
+            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_activity_action, menu);
         return true;
     }
 
@@ -100,10 +105,20 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.       
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_exit) {
+            finish();
             return true;
         }
-        return super.onOptionsItemSelected(item);
+        if (id == R.id.action_map) {
+            Intent mapScreen = new Intent().setClass(getApplicationContext(), BleMapActivity.class);
+            ArrayList<BleDeviceRecord> arrayToPut = new ArrayList<BleDeviceRecord>();
+            for (int i = 0; i < bleDevices.size(); i++)
+                arrayToPut.add (bleDevices.get(i));
+            mapScreen.putParcelableArrayListExtra("devices", arrayToPut);
+            startActivity(mapScreen);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);         
     }
     
  // Device scan callback.
